@@ -93,4 +93,4 @@ Temporary Items
 .apdisk
 **/*.go.bak
 *.go.bak
-.idea
+.idea/*
