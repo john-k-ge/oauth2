@@ -165,6 +165,24 @@ func (c *Config) PasswordCredentialsToken(ctx context.Context, username, passwor
 	})
 }
 
+// PasscodeCredentialsToken converts a resource owner's passcode into a token.
+//
+// This is like the PasswordCredentialsToken, except the user authenticates to the
+// IdP outside of the code (e.g. via an SSO logon page).  The grant_type will still be
+// `password`, but this will send the passcode value against a `passcode` key.
+// This is necessary for `cf login --sso`
+// (cf. https://docs.cloudfoundry.org/api/uaa/version/4.6.0/index.html#one-time-passcode)
+//
+// The HTTP client to use is derived from the context.
+// If nil, http.DefaultClient is used.
+func (c *Config) PasscodeCredentialsToken(ctx context.Context, passcode string) (*Token, error) {
+	return retrieveToken(ctx, c, url.Values{
+		"grant_type": {"password"},
+		"passcode":   {passcode},
+		"scope":      internal.CondVal(strings.Join(c.Scopes, " ")),
+	})
+}
+
 // Exchange converts an authorization code into a token.
 //
 // It is used after a resource provider redirects the user back
